@@ -56,6 +56,10 @@
 #define HEIGHT(X)               ((X)->h + 2 * (X)->bw)
 #define TAGMASK                 ((1 << LENGTH(tags)) - 1)
 #define TEXTW(X)                (drw_fontset_getwidth(drw, (X)) + lrpad)
+#define ISFULLSCREEN(C)         ((!C->isfloating && ( \
+									&monocle == C->mon->lt[C->mon->sellt]->arrange \
+									|| !nexttiled(nexttiled(C->mon->clients)->next) \
+								)))
 
 /* enums */
 enum { CurNormal, CurResize, CurMove, CurLast }; /* cursor */
@@ -1286,6 +1290,14 @@ resizeclient(Client *c, int x, int y, int w, int h)
 	c->oldw = c->w; c->w = wc.width = w;
 	c->oldh = c->h; c->h = wc.height = h;
 	wc.border_width = c->bw;
+
+	/* don't do borders in monocle */
+	if (ISFULLSCREEN(c)) {
+		wc.border_width = 0;
+		c->w = wc.width += c->bw * 2;
+		c->h = wc.height += c->bw * 2;
+	}
+
 	XConfigureWindow(dpy, c->win, CWX|CWY|CWWidth|CWHeight|CWBorderWidth, &wc);
 	configure(c);
 	XSync(dpy, False);
