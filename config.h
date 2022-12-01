@@ -124,7 +124,7 @@ static const char *sh_shutdown[] = { "/bin/sh", "-c", "sudo shutdown -P now", NU
 static const char *switchstatuspanel[] = { "/bin/sh", "-c", "if pgrep -f ^/tmp/light-status-slstatus; then pkill -f /tmp/light-status-slstatus; else light-status-slstatus; fi", NULL };
 
 /* KEYS */
-static Key keys[] = {
+static const Key keys[] = {
 	/* modifier                     key        function        argument */
 	// Audio volume controls
 	{ 0,              XF86XK_AudioLowerVolume, spawn,          {.v = downvolD } },
@@ -208,7 +208,7 @@ static Key keys[] = {
 
 /* button definitions */
 /* click can be ClkTagBar, ClkLtSymbol, ClkStatusText, ClkWinTitle, ClkClientWin, or ClkRootWin */
-static Button buttons[] = {
+static const Button buttons[] = {
 	/* click                event mask      button          function        argument */
 	
     // Window position/size controls

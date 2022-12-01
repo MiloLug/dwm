@@ -1,2 +1,5 @@
 /dwm
 *.o
+.vscode
+.idea
+.ide
