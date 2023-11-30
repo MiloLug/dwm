@@ -1,10 +1,13 @@
 //keys
 #include "XF86keysym.h"
 
+#define DE_CONTROL "/usr/local/de-scripts/control"
+#define DE_WIDGETS "/usr/local/de-scripts/widgets"
+
 /* appearance */
 static const unsigned int borderpx  = 1;        /* border pixel of windows */
 static const unsigned int snap      = 32;       /* snap pixel */
-static const int showbar            = 0;        /* 0 means no bar */
+static const int showbar            = 1;        /* 0 means no bar */
 static const int topbar             = 0;        /* 0 means bottom bar */
 static const char *fonts[]          = { "monospace:size=8" };
 static const char dmenufont[]       = "monospace:size=8";
@@ -65,88 +68,74 @@ static const char *clipmenu[] = { "clipmenu", NULL };
 
 // volume
 // Default
-static const char *upvolD[]   = { "/bin/sh", "-c",
-    "if ! pgrep -f ^/tmp/light-status-vol; then light-status-vol & (sleep 3; pkill -f /tmp/light-status-vol) & fi;"
-    "pactl set-sink-volume `pactl get-default-sink` +5%", NULL
+static const char *up_volD[]   = { "/bin/sh", "-c",
+    DE_WIDGETS "/run-widget volume-indicator 3 & "
+    DE_CONTROL "/sound change_value 5", NULL
 };
-static const char *downvolD[] = { "/bin/sh", "-c", 
-    "if ! pgrep -f ^/tmp/light-status-vol; then light-status-vol & (sleep 3; pkill -f /tmp/light-status-vol) & fi;"
-    "pactl set-sink-volume `pactl get-default-sink` -5%", NULL
+static const char *down_volD[] = { "/bin/sh", "-c", 
+    DE_WIDGETS "/run-widget volume-indicator 3 & "
+    DE_CONTROL "/sound change_value -5", NULL
 };
-static const char *mutevolD[] = { "/bin/sh", "-c",
-    "if ! pgrep -f ^/tmp/light-status-vol; then light-status-vol & (sleep 3; pkill -f /tmp/light-status-vol) & fi;"
-    "/usr/bin/pamixer -t", NULL
+static const char *mute_volD[] = { "/bin/sh", "-c",
+    DE_WIDGETS "/run-widget volume-indicator 3 & "
+    DE_CONTROL "/sound toggle_muted",NULL
 };
-// 0 Dev
-static const char *upvol0[]   = { "/usr/bin/pactl", "set-sink-volume", "0", "+5%",     NULL };
-static const char *downvol0[] = { "/usr/bin/pactl", "set-sink-volume", "0", "-5%",     NULL };
-static const char *mutevol0[] = { "/usr/bin/pactl", "set-sink-mute",   "0", "toggle",  NULL };
 
 // brightness
-static const char *upbrigh[] = {
-    "/bin/sh", "-c",
-    "if ! pgrep -f ^/tmp/light-status-brightness; then light-status-brightness & (sleep 3; pkill -f /tmp/light-status-brightness) & fi;"
-    "sudo percentage-conf -FM /sys/class/backlight/intel_backlight/max_brightness -Fc /sys/class/backlight/intel_backlight/actual_brightness -Fo /sys/class/backlight/intel_backlight/brightness -i 5",
-    NULL
+static const char *up_brightness[] = { "/bin/sh", "-c",
+    DE_WIDGETS "/run-widget brightness-indicator 3 & "
+	"sudo " DE_CONTROL "/backlight change_value 5", NULL
 };
-static const char *downbrigh[] = {
-    "/bin/sh", "-c",
-    "if ! pgrep -f ^/tmp/light-status-brightness; then light-status-brightness & (sleep 3; pkill -f /tmp/light-status-brightness) & fi;"
-    "sudo percentage-conf -FM /sys/class/backlight/intel_backlight/max_brightness -Fc /sys/class/backlight/intel_backlight/actual_brightness -Fo /sys/class/backlight/intel_backlight/brightness -i -5",
-    NULL
+static const char *down_brightness[] = { "/bin/sh", "-c",
+    DE_WIDGETS "/run-widget brightness-indicator 3 & "
+	"sudo " DE_CONTROL "/backlight change_value -5", NULL
 };
 
-static const char *up_redshift[] = {
-    "/bin/sh", "-c",
-    "if ! pgrep -f ^/tmp/light-status-redshift; then light-status-redshift & (sleep 3; pkill -f /tmp/light-status-redshift) & fi;"
-    "percentage-conf -m 1000 -M 25000 -Fc ~/dwm.conf.d/redshift-state.conf -Fo ~/dwm.conf.d/redshift-state.conf -i 5;" 
-    "redshift -P -O `cat ~/dwm.conf.d/redshift-state.conf`",
-    NULL
+// redshift
+static const char *up_redshift[] = { "/bin/sh", "-c",
+    DE_WIDGETS "/run-widget redshift-indicator 3 & "
+	DE_CONTROL "/redshift change_value 5", NULL
 };
-static const char *down_redshift[] = {
-    "/bin/sh", "-c",
-    "if ! pgrep -f ^/tmp/light-status-redshift; then light-status-redshift & (sleep 3; pkill -f /tmp/light-status-redshift) & fi;"
-    "percentage-conf -m 1000 -M 25000 -Fc ~/dwm.conf.d/redshift-state.conf -Fo ~/dwm.conf.d/redshift-state.conf -i -5;" 
-    "redshift -P -O `cat ~/dwm.conf.d/redshift-state.conf`",
-    NULL
+static const char *down_redshift[] = { "/bin/sh", "-c",
+    DE_WIDGETS "/run-widget redshift-indicator 3 & "
+	DE_CONTROL "/redshift change_value -5", NULL
 };
-static const char *normal_redshift[] = { "/bin/sh", "-c", "cat ~/dwm.conf.d/redshift-state.normal.conf | tee ~/dwm.conf.d/redshift-state.conf | (read a; redshift -PO $a)", NULL };
+static const char *toggle_redshift[] = { "/bin/sh", "-c",
+    DE_WIDGETS "/run-widget redshift-indicator 3 & "
+	DE_CONTROL "/redshift toggle_enabled", NULL
+};
 
 //screenshot
-static const char *fullscreenshot[] = { "screenshot",  NULL };
-static const char *activescreenshot[] = { "screenshot", "window", NULL };
-static const char *selectscreenshot[] = { "screenshot", "select", NULL };
+static const char *full_screenshot[] = { "screenshot",  NULL };
+static const char *active_screenshot[] = { "screenshot", "window", NULL };
+static const char *select_screenshot[] = { "screenshot", "select", NULL };
 
 //power
 static const char *sh_sleep[] = { "/bin/sh", "-c", "slock & sudo zzz", NULL };
 static const char *sh_shutdown[] = { "/bin/sh", "-c", "sudo shutdown -P now", NULL };
 
-static const char *switchstatuspanel[] = { "/bin/sh", "-c", "if pgrep -f ^/tmp/light-status-slstatus; then pkill -f /tmp/light-status-slstatus; else light-status-slstatus; fi", NULL };
+static const char *switch_status_panel[] = { "/bin/sh", "-c", "if pgrep -f ^/tmp/light-status-slstatus; then pkill -f /tmp/light-status-slstatus; else light-status-slstatus; fi", NULL };
 
 /* KEYS */
 static const Key keys[] = {
 	/* modifier                     key        function        argument */
 	// Audio volume controls
-	{ 0,              XF86XK_AudioLowerVolume, spawn,          {.v = downvolD } },
-	{ 0,              XF86XK_AudioMute,        spawn,          {.v = mutevolD } },
-	{ 0,              XF86XK_AudioRaiseVolume, spawn,          {.v = upvolD } },
-	
-	{ ShiftMask,      XF86XK_AudioLowerVolume, spawn,          {.v = downvol0 } },
-	{ ShiftMask,      XF86XK_AudioMute,        spawn,          {.v = mutevol0 } },
-	{ ShiftMask,      XF86XK_AudioRaiseVolume, spawn,          {.v = upvol0 } },
+	{ 0,              XF86XK_AudioLowerVolume, spawn,          {.v = down_volD } },
+	{ 0,              XF86XK_AudioMute,        spawn,          {.v = mute_volD } },
+	{ 0,              XF86XK_AudioRaiseVolume, spawn,          {.v = up_volD } },
 
 	// Brightness controls
-	{ 0,               XF86XK_MonBrightnessUp, spawn,          {.v = upbrigh } },
-	{ 0,             XF86XK_MonBrightnessDown, spawn,          {.v = downbrigh } },
+	{ 0,               XF86XK_MonBrightnessUp, spawn,          {.v = up_brightness } },
+	{ 0,             XF86XK_MonBrightnessDown, spawn,          {.v = down_brightness } },
     
     { MODKEY,          XF86XK_MonBrightnessUp, spawn,          {.v = up_redshift } },
 	{ MODKEY,        XF86XK_MonBrightnessDown, spawn,          {.v = down_redshift } },
-	{ ControlMask,     XF86XK_MonBrightnessUp, spawn,          {.v = normal_redshift } },
+	{ ControlMask,     XF86XK_MonBrightnessUp, spawn,          {.v = toggle_redshift } },
 
 	// Screenshots
-	{ 0,                            XK_Print,  spawn,          {.v = fullscreenshot } },
-	{ ControlMask,                  XK_Print,  spawn,          {.v = activescreenshot } },
-	{ ShiftMask,                    XK_Print,  spawn,          {.v = selectscreenshot } },	
+	{ 0,                            XK_Print,  spawn,          {.v = full_screenshot } },
+	{ ControlMask,                  XK_Print,  spawn,          {.v = active_screenshot } },
+	{ ShiftMask,                    XK_Print,  spawn,          {.v = select_screenshot } },	
 
 	// Power management
 	{ MODKEY,                XF86XK_PowerOff,  spawn,          {.v = sh_sleep } },
@@ -155,7 +144,7 @@ static const Key keys[] = {
 	// Other
 	{ MODKEY,                       XK_r,      spawn,          {.v = dmenucmd } },
 	{ MODKEY,                       XK_grave,  spawn,          {.v = termcmd } },
-	{ MODKEY,                       XK_b,      spawn,          {.v = switchstatuspanel } },
+	{ MODKEY,                       XK_b,      spawn,          {.v = switch_status_panel } },
     { MODKEY,                  XK_backslash,   spawn,          {.v = clipmenu } },
 
     // DWM Controls
