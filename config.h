@@ -69,66 +69,73 @@ static const char *clipmenu[] = { "clipmenu", NULL };
 // volume
 // Default
 static const char *up_volD[]   = { "/bin/sh", "-c",
-    DE_WIDGETS "/run-widget volume-indicator 3 & "
-    DE_CONTROL "/sound change_value 5", NULL
+	DE_WIDGETS "/run-widget volume-indicator 3 & "
+	DE_CONTROL "/sound change_value 5", NULL
 };
 static const char *down_volD[] = { "/bin/sh", "-c", 
-    DE_WIDGETS "/run-widget volume-indicator 3 & "
-    DE_CONTROL "/sound change_value -5", NULL
+	DE_WIDGETS "/run-widget volume-indicator 3 & "
+	DE_CONTROL "/sound change_value -5", NULL
 };
 static const char *mute_volD[] = { "/bin/sh", "-c",
-    DE_WIDGETS "/run-widget volume-indicator 3 & "
-    DE_CONTROL "/sound toggle_muted",NULL
+	DE_WIDGETS "/run-widget volume-indicator 3 & "
+	DE_CONTROL "/sound toggle_muted",NULL
 };
 
 // brightness
 static const char *up_brightness[] = { "/bin/sh", "-c",
-    DE_WIDGETS "/run-widget brightness-indicator 3 & "
+	DE_WIDGETS "/run-widget brightness-indicator 3 & "
 	"sudo " DE_CONTROL "/backlight change_value 5", NULL
 };
 static const char *down_brightness[] = { "/bin/sh", "-c",
-    DE_WIDGETS "/run-widget brightness-indicator 3 & "
+	DE_WIDGETS "/run-widget brightness-indicator 3 & "
 	"sudo " DE_CONTROL "/backlight change_value -5", NULL
 };
 
 // redshift
 static const char *up_redshift[] = { "/bin/sh", "-c",
-    DE_WIDGETS "/run-widget redshift-indicator 3 & "
+	DE_WIDGETS "/run-widget redshift-indicator 3 & "
 	DE_CONTROL "/redshift change_value 5", NULL
 };
 static const char *down_redshift[] = { "/bin/sh", "-c",
-    DE_WIDGETS "/run-widget redshift-indicator 3 & "
+	DE_WIDGETS "/run-widget redshift-indicator 3 & "
 	DE_CONTROL "/redshift change_value -5", NULL
 };
 static const char *toggle_redshift[] = { "/bin/sh", "-c",
-    DE_WIDGETS "/run-widget redshift-indicator 3 & "
+	DE_WIDGETS "/run-widget redshift-indicator 3 & "
 	DE_CONTROL "/redshift toggle_enabled", NULL
 };
+static const char *play_pause_cmd[] = { "playerctl", "play-pause", NULL };
+static const char *play_next_cmd[] = { "playerctl", "next", NULL };
+static const char *play_prev_cmd[] = { "playerctl", "previous", NULL };
+
+// some widgets
+static const char *toggle_slstatus[] = { DE_WIDGETS "/switch-widget", "slstatus-panel", NULL };
 
 //screenshot
 static const char *full_screenshot[] = { "screenshot",  NULL };
 static const char *active_screenshot[] = { "screenshot", "window", NULL };
-static const char *select_screenshot[] = { "screenshot", "select", NULL };
+static const char *select_screenshot[] = { "screenshot", "-i", "select", NULL };
 
 //power
 static const char *sh_sleep[] = { "/bin/sh", "-c", "slock & (sleep 0.1; sudo systemctl suspend)", NULL };
 static const char *sh_shutdown[] = { "/bin/sh", "-c", "sudo systemctl poweroff", NULL };
 
-static const char *switch_status_panel[] = { "/bin/sh", "-c", "if pgrep -f ^/tmp/light-status-slstatus; then pkill -f /tmp/light-status-slstatus; else light-status-slstatus; fi", NULL };
-
 /* KEYS */
 static const Key keys[] = {
 	/* modifier                     key        function        argument */
-	// Audio volume controls
+	// Media controls
 	{ 0,              XF86XK_AudioLowerVolume, spawn,          {.v = down_volD } },
 	{ 0,              XF86XK_AudioMute,        spawn,          {.v = mute_volD } },
 	{ 0,              XF86XK_AudioRaiseVolume, spawn,          {.v = up_volD } },
+	{ 0,              XF86XK_AudioPlay,        spawn,          {.v = play_pause_cmd } },
+	{ 0,              XF86XK_AudioNext,        spawn,          {.v = play_next_cmd } },
+	{ 0,              XF86XK_AudioPrev,        spawn,          {.v = play_prev_cmd } },
 
 	// Brightness controls
 	{ 0,               XF86XK_MonBrightnessUp, spawn,          {.v = up_brightness } },
 	{ 0,             XF86XK_MonBrightnessDown, spawn,          {.v = down_brightness } },
-    
-    { MODKEY,          XF86XK_MonBrightnessUp, spawn,          {.v = up_redshift } },
+	
+	{ MODKEY,          XF86XK_MonBrightnessUp, spawn,          {.v = up_redshift } },
 	{ MODKEY,        XF86XK_MonBrightnessDown, spawn,          {.v = down_redshift } },
 	{ ControlMask,     XF86XK_MonBrightnessUp, spawn,          {.v = toggle_redshift } },
 
@@ -144,10 +151,10 @@ static const Key keys[] = {
 	// Other
 	{ MODKEY,                       XK_r,      spawn,          {.v = dmenucmd } },
 	{ MODKEY,                       XK_grave,  spawn,          {.v = termcmd } },
-	{ MODKEY,                       XK_b,      spawn,          {.v = switch_status_panel } },
-    { MODKEY,                  XK_backslash,   spawn,          {.v = clipmenu } },
+	{ MODKEY,                       XK_b,      spawn,          {.v = toggle_slstatus } },
+	{ MODKEY,                  XK_backslash,   spawn,          {.v = clipmenu } },
 
-    // DWM Controls
+	// DWM Controls
 	{ MODKEY,                       XK_j,      focusstack,     {.i = +1 } },
 	{ MODKEY,                       XK_k,      focusstack,     {.i = -1 } },
 	
@@ -191,8 +198,8 @@ static const Key keys[] = {
 	TAGKEYS(                        XK_8,                      7)
 	TAGKEYS(                        XK_9,                      8)
 	
-    // Quit
-    { ControlMask|ShiftMask,        XK_q,      quit,           {0} },
+	// Quit
+	{ ControlMask|ShiftMask,        XK_q,      quit,           {0} },
 };
 
 /* button definitions */
@@ -200,17 +207,17 @@ static const Key keys[] = {
 static const Button buttons[] = {
 	/* click                event mask      button          function        argument */
 	
-    // Window position/size controls
-    { ClkClientWin,  ControlMask|MODKEY,    Button1,        movemouse,      {0} },
+	// Window position/size controls
+	{ ClkClientWin,  ControlMask|MODKEY,    Button1,        movemouse,      {0} },
 	{ ClkClientWin,  ControlMask|MODKEY,    Button2,        togglefloating, {0} },
 	{ ClkClientWin,  ControlMask|MODKEY,    Button3,        resizemouse,    {0} },
 	
-    // Other
-    { ClkLtSymbol,          0,              Button1,        setlayout,      {0} },
+	// Other
+	{ ClkLtSymbol,          0,              Button1,        setlayout,      {0} },
 	{ ClkLtSymbol,          0,              Button3,        setlayout,      {.v = &layouts[2]} },
 	{ ClkWinTitle,          0,              Button2,        zoom,           {0} },
 	{ ClkStatusText,        0,              Button2,        spawn,          {.v = termcmd } },
-    { ClkTagBar,            0,              Button1,        view,           {0} },
+	{ ClkTagBar,            0,              Button1,        view,           {0} },
 	{ ClkTagBar,            0,              Button3,        toggleview,     {0} },
 	{ ClkTagBar,            MODKEY,         Button1,        tag,            {0} },
 	{ ClkTagBar,            MODKEY,         Button3,        toggletag,      {0} },
