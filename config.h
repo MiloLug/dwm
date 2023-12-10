@@ -1,8 +1,10 @@
 //keys
 #include "XF86keysym.h"
+#include "stddef.h"
 
 #define DE_CONTROL "/usr/local/de-scripts/control"
 #define DE_WIDGETS "/usr/local/de-scripts/widgets"
+#define DE_UTILS "/usr/local/de-scripts/utils"
 
 /* appearance */
 static const unsigned int borderpx  = 1;        /* border pixel of windows */
@@ -63,6 +65,7 @@ static const Layout layouts[] = {
 /* commands */
 static char dmenumon[2] = "0"; /* component of dmenucmd, manipulated in spawn() */
 static const char *dmenucmd[] = { "dmenu_run", "-m", dmenumon, "-fn", dmenufont, "-nb", col_gray1, "-nf", col_gray3, "-sb", col_cyan, "-sf", col_gray4, NULL };
+static const char *dmenu_active_search_cmd[] = { DE_UTILS "/active-apps-selector", "-m", dmenumon, "-fn", dmenufont, "-nb", col_gray1, "-nf", col_gray3, "-sb", col_cyan, "-sf", col_gray4, NULL };
 static const char *termcmd[]  = { "kitty", NULL };
 static const char *clipmenu[] = { "clipmenu", NULL };
 
@@ -112,9 +115,9 @@ static const char *play_prev_cmd[] = { "playerctl", "previous", NULL };
 static const char *toggle_slstatus[] = { DE_WIDGETS "/switch-widget", "slstatus-panel", NULL };
 
 //screenshot
-static const char *full_screenshot[] = { "screenshot",  NULL };
-static const char *active_screenshot[] = { "screenshot", "window", NULL };
-static const char *select_screenshot[] = { "screenshot", "-i", "select", NULL };
+static const char *full_screenshot[] = { DE_UTILS "/screenshot",  NULL };
+static const char *active_screenshot[] = { DE_UTILS "/screenshot", "window", NULL };
+static const char *select_screenshot[] = { DE_UTILS "/screenshot", "-i", "select", NULL };
 
 //power
 static const char *sh_sleep[] = { "/bin/sh", "-c", "slock & (sleep 0.1; sudo systemctl suspend)", NULL };
@@ -153,6 +156,7 @@ static const Key keys[] = {
 	{ MODKEY,                       XK_grave,  spawn,          {.v = termcmd } },
 	{ MODKEY,                       XK_b,      spawn,          {.v = toggle_slstatus } },
 	{ MODKEY,                  XK_backslash,   spawn,          {.v = clipmenu } },
+    { MODKEY|ShiftMask,             XK_t,      spawn,          {.v = dmenu_active_search_cmd } },
 
 	// DWM Controls
 	{ MODKEY,                       XK_j,      focusstack,     {.i = +1 } },
