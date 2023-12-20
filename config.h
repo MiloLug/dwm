@@ -116,8 +116,8 @@ static const char *toggle_slstatus[] = { DE_WIDGETS "/switch-widget", "slstatus-
 
 //screenshot
 static const char *full_screenshot[] = { DE_UTILS "/screenshot",  NULL };
-static const char *active_screenshot[] = { DE_UTILS "/screenshot", "window", NULL };
-static const char *select_screenshot[] = { DE_UTILS "/screenshot", "-i", "select", NULL };
+static const char *active_screenshot[] = { DE_UTILS "/screenshot", "-a", "window", NULL };
+static const char *select_screenshot[] = { DE_UTILS "/screenshot", "-i", "-a", "select", "-h", NULL };
 
 //power
 static const char *sh_sleep[] = { "/bin/sh", "-c", "slock & (sleep 0.1; sudo systemctl suspend)", NULL };
